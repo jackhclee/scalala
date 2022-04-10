@@ -4,7 +4,7 @@ pipeline {
   stages {
     stage("First") {
       steps {
-        echo "Hello"
+        echo "Hello ${env.JOB_NAME} ${env.BUILD_NUMBER}"
       }
     }
   }
