@@ -1,0 +1,85 @@
+{
+  "mappings": [
+    {
+      "scenarioName": "To do list",
+      "requiredScenarioState": "Started",
+      "newScenarioState": "Step 2",
+      "request": {
+        "method": "GET",
+        "url": "/sample"
+      },
+      "response": {
+        "status": 500,
+        "statusMessage": "Internal Server Error"
+      }
+    },
+    {
+      "scenarioName": "To do list",
+      "requiredScenarioState": "Step 2",
+      "newScenarioState": "Step 3",
+      "request": {
+        "method": "GET",
+        "url": "/sample"
+      },
+      "response": {
+        "status": 200,
+        "statusMessage": "Everything was just fine!",
+        "body": "This is Step 2"
+      }
+    },
+    {
+      "scenarioName": "To do list",
+      "requiredScenarioState": "Step 3",
+      "request": {
+        "method": "GET",
+        "url": "/sample"
+      },
+      "response": {
+        "status": 200,
+        "statusMessage": "Everything was just fine!",
+        "body": "This is Step 3"
+      }
+    },
+    {
+      "scenarioName": "scenario2",
+      "requiredScenarioState": "Started",
+      "newScenarioState": "Step 2",
+      "request": {
+        "method": "GET",
+        "url": "/scenario-2"
+      },
+      "response": {
+        "status": 200,
+        "statusMessage": "Everything was just fine!",
+        "body": "This is Step 1"
+      }
+    },
+    {
+      "scenarioName": "scenario2",
+      "requiredScenarioState": "Step 2",
+      "newScenarioState": "Step 3",
+      "request": {
+        "method": "GET",
+        "url": "/scenario-2"
+      },
+      "response": {
+        "status": 500,
+        "statusMessage": "Internal Server Error"
+      }
+    },
+    {
+      "scenarioName": "scenario2",
+      "requiredScenarioState": "Step 3",
+      "request": {
+        "method": "GET",
+        "url": "/scenario-2"
+      },
+      "response": {
+        "status": 200,
+        "statusMessage": "Everything was just fine!",
+        "body": "This is Step 3"
+      }
+    }
+
+  ]
+}
