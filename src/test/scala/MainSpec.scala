@@ -18,13 +18,21 @@ import scala.util.{Failure, Success, Try}
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import sttp.client3.quick._
+
 import scala.concurrent.duration.FiniteDuration
 import retry._
 import retry.RetryDetails._
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
+import org.json4s.Extraction.decompose
+import org.scalactic.TimesOnInt.convertIntToRepeater
+import org.scalamock.scalatest.MockFactory
+import org.json4s._
+import org.json4s.jackson.JsonMethods._
 
-class MainSpec extends AnyWordSpec with Matchers {
+import java.io.StringWriter
+
+class MainSpec extends AnyWordSpec with Matchers with MockFactory {
 
   val keyApple: String = "APPLE"
   val keyBanana: String = "BANANA"
@@ -416,139 +424,371 @@ class MainSpec extends AnyWordSpec with Matchers {
   //    }
   //  }
 
-  "Test 18" should {
-    "First download fails" in {
+//  "Test 18" should {
+//    "First download fails" in {
+//
+//      val wireMockServer = new WireMockServer(options().port(8089)
+//        .usingFilesUnderClasspath("wiremock")
+//      ) //No-args constructor will start on port 8080, no HTTPS
+//
+//      wireMockServer.start()
+//
+//      val request = basicRequest
+//        .get(uri"http://127.0.0.1:8089/sample")
+//
+//      val retryFiveTimes = RetryPolicies.limitRetries[IO](5)
+//
+//      val logMessages = collection.mutable.ArrayBuffer.empty[String]
+//      // logMessages: collection.mutable.ArrayBuffer[String] = ArrayBuffer(
+//      //   "Failed to download. So far we have retried 0 times.",
+//      // )
+//
+//      def logError(err: Throwable, details: RetryDetails): IO[Unit] = details match {
+//
+//        case WillDelayAndRetry(nextDelay: FiniteDuration,
+//        retriesSoFar: Int,
+//        cumulativeDelay: FiniteDuration) =>
+//          IO {
+//            logMessages.append(
+//              s"Failed to download. So far we have retried $retriesSoFar times.")
+//          }
+//
+//        case GivingUp(totalRetries: Int, totalDelay: FiniteDuration) =>
+//          IO {
+//            logMessages.append(s"Giving up after $totalRetries retries")
+//          }
+//
+//      }
+//
+//      // Now we have a retry policy and an error handler, we can wrap our `IO` inretries.
+//
+//      val flakyRequest: IO[String] = IO {
+//        println("calling remote API")
+//        request.send(backend).body match {
+//          case Left(error) => throw new Error(s"Error when executing request:")
+//          case Right(data) =>
+//            data
+//        }
+//      }
+//
+//      val flakyRequestWithRetry: IO[String] =
+//        retryingOnAllErrors[String](
+//          policy = retryFiveTimes,
+//          onError = logError
+//        )(flakyRequest)
+//
+//      val result = flakyRequestWithRetry.unsafeRunSync()
+//
+//      logMessages.foreach(println)
+//
+//
+//
+//      // Failed to download. So far we have retried 0 times.
+//
+//      WireMock.configureFor("127.0.0.1", 8089)
+//      WireMock.reset()
+//
+//      wireMockServer.shutdown();
+//
+//      result should be("This is Step 2")
+//    }
+//
+//    "Second download fails" in {
+//
+//      val wireMockServer = new WireMockServer(options().port(9000)
+//        .usingFilesUnderClasspath("wiremock")
+//      ) //No-args constructor will start on port 8080, no HTTPS
+//
+//      wireMockServer.start()
+//
+//      val request = basicRequest
+//        .get(uri"http://127.0.0.1:9000/scenario-2")
+//
+//      val retryFiveTimes = RetryPolicies.limitRetries[IO](3)
+//
+//      val logMessages = collection.mutable.ArrayBuffer.empty[String]
+//      // logMessages: collection.mutable.ArrayBuffer[String] = ArrayBuffer(
+//      //   "Failed to download. So far we have retried 0 times.",
+//      // )
+//
+//      def logError(err: Throwable, details: RetryDetails): IO[Unit] = details match {
+//
+//        case WillDelayAndRetry(nextDelay: FiniteDuration,
+//        retriesSoFar: Int,
+//        cumulativeDelay: FiniteDuration) =>
+//          IO {
+//            logMessages.append(
+//              s"Failed to download. So far we have retried $retriesSoFar times.")
+//          }
+//
+//        case GivingUp(totalRetries: Int, totalDelay: FiniteDuration) =>
+//          IO {
+//            logMessages.append(s"Giving up after $totalRetries retries")
+//          }
+//
+//      }
+//
+//      // Now we have a retry policy and an error handler, we can wrap our `IO` inretries.
+//
+//      val flakyRequest: IO[String] = IO {
+//        println("calling remote API")
+//        println("==================")
+//        request.send(backend).body match {
+//          case Left(error) => throw new Error(s"Error when executing request:")
+//          case Right(data) =>
+//            data
+//        }
+//      }
+//
+//      val flakyRequestWithRetry: IO[String] =
+//        retryingOnAllErrors[String](
+//          policy = retryFiveTimes,
+//          onError = logError
+//        )(flakyRequest)
+//
+//      val result = flakyRequestWithRetry.unsafeRunSync()
+//
+//      logMessages.foreach(println)
+//
+//      // Failed to download. So far we have retried 0 times.
+//
+//      WireMock.configureFor("127.0.0.1", 9000)
+//
+//      wireMockServer.shutdown();
+//
+//      result should be("This is Step 1")
+//    }
+//  }
 
-      val wireMockServer = new WireMockServer(options().port(8089)
-        .usingFilesUnderClasspath("wiremock")
-      ) //No-args constructor will start on port 8080, no HTTPS
+//  "Test 20" should {
+//    "Second download fails" in {
+//
+//      val wireMockServer = new WireMockServer(options().port(10000)
+//        .usingFilesUnderClasspath("wiremock")
+//      ) //No-args constructor will start on port 8080, no HTTPS
+//
+//      wireMockServer.start()
+//
+//
+//      val retryFiveTimes = RetryPolicies.limitRetries[IO](3)
+//
+//      val logMessages = collection.mutable.ArrayBuffer.empty[String]
+//      // logMessages: collection.mutable.ArrayBuffer[String] = ArrayBuffer(
+//      //   "Failed to download. So far we have retried 0 times.",
+//      // )
+//
+//      def logError(err: Throwable, details: RetryDetails): IO[Unit] = details match {
+//
+//        case WillDelayAndRetry(nextDelay: FiniteDuration,
+//        retriesSoFar: Int,
+//        cumulativeDelay: FiniteDuration) =>
+//          IO {
+//            logMessages.append(
+//              s"Failed to download. So far we have retried $retriesSoFar times.")
+//          }
+//
+//        case GivingUp(totalRetries: Int, totalDelay: FiniteDuration) =>
+//          IO {
+//            logMessages.append(s"Giving up after $totalRetries retries")
+//          }
+//
+//      }
+//
+//      // Now we have a retry policy and an error handler, we can wrap our `IO` inretries.
+//
+//      val flakyRequest: IO[java.io.File] = IO {
+//        println("calling remote API")
+//
+//        val request = basicRequest
+//          .get(uri"http://127.0.0.1:10000/scenario-4")
+//
+//        //        val file = java.io.File.createTempFile("temp", "xyz")
+//        val file = new java.io.File("abc.tar")
+//        //        file.createNewFile()
+//        println(file.getAbsolutePath())
+//
+//        request.response(asFile(file))
+//        val response = request.send(backend)
+//
+//        response.headers.foreach(println)
+//        val responseBody = response.body
+//
+//        println(file.length())
+//        responseBody match {
+//          case Left(error) => throw new Exception(s"Error when executing request:")
+//          case Right(data) =>
+//            println(s"data.length ${data.length}")
+//            println(file.length())
+//            file
+//        }
+//      }
+//
+//      val flakyRequestWithRetry: IO[java.io.File] =
+//        retryingOnAllErrors[java.io.File](
+//          policy = retryFiveTimes,
+//          onError = logError
+//        )(flakyRequest)
+//
+//      import better.files.{File => BetterFile, _}
+//      val result = flakyRequestWithRetry.unsafeRunSync()
+//
+//      println(result.length())
+//      println(BetterFile(result.getPath).md5)
+//
+//      logMessages.foreach(println)
+//
+//      // Failed to download. So far we have retried 0 times.
+//
+//      WireMock.configureFor("127.0.0.1", 10000)
+//
+//      wireMockServer.shutdown();
+//
+//      result should be("This is Step 1")
+//    }
+//
+//    "Simple" in {
+//      val wireMockServer = new WireMockServer(options().port(10000)
+//        .usingFilesUnderClasspath("wiremock")
+//      ) //No-args constructor will start on port 8080, no HTTPS
+//
+//      wireMockServer.start()
+//
+//
+//      // Now we have a retry policy and an error handler, we can wrap our `IO` inretries.
+//
+//      println("calling remote API")
+//
+//      val file = new java.io.File("abc.tar")
+//
+//      val request = basicRequest
+//        .get(uri"http://127.0.0.1:8080/TARA.tar")
+//
+//      //        val file = java.io.File.createTempFile("temp", "xyz")
+//
+//      //        file.createNewFile()
+//      println(file.getAbsolutePath())
+//
+//      val response = request.response(asFile(file)).send(backend)
+//
+//      response.headers.foreach(println)
+//      val responseBody = response.body
+//
+//      println(file.length())
+//      responseBody match {
+//        case Left(error) => throw new Exception(s"Error when executing request:")
+//        case Right(data) =>
+//          println(s"data.length ${data.length}")
+//          println(file.length())
+//      }
+//
+//      import better.files.{File => BetterFile, _}
+//
+//      println(file.length())
+//
+//      // Failed to download. So far we have retried 0 times.
+//
+//      WireMock.configureFor("127.0.0.1", 10000)
+//
+//      wireMockServer.shutdown();
+//
+//      BetterFile(file.getPath).md5 should be("This is Step 1")
+//    }
+//
+//  }
 
-      wireMockServer.start()
-
-      val request = basicRequest
-        .get(uri"http://127.0.0.1:8089/sample")
-
-      val retryFiveTimes = RetryPolicies.limitRetries[IO](5)
-
-      val logMessages = collection.mutable.ArrayBuffer.empty[String]
-      // logMessages: collection.mutable.ArrayBuffer[String] = ArrayBuffer(
-      //   "Failed to download. So far we have retried 0 times.",
-      // )
-
-      def logError(err: Throwable, details: RetryDetails): IO[Unit] = details match {
-
-        case WillDelayAndRetry(nextDelay: FiniteDuration,
-        retriesSoFar: Int,
-        cumulativeDelay: FiniteDuration) =>
-          IO {
-            logMessages.append(
-              s"Failed to download. So far we have retried $retriesSoFar times.")
-          }
-
-        case GivingUp(totalRetries: Int, totalDelay: FiniteDuration) =>
-          IO {
-            logMessages.append(s"Giving up after $totalRetries retries")
-          }
-
+  "Mock Object" should {
+    "abc" in {
+      trait Reporter {
+        def report : String
+        def ack : Unit
       }
 
-      // Now we have a retry policy and an error handler, we can wrap our `IO` inretries.
+      val mockReporter = mock[Reporter]
 
-      val flakyRequest: IO[String] = IO {
-        println("calling remote API")
-        request.send(backend).body match {
-          case Left(error) => throw new Error(s"Error when executing request:")
-          case Right(data) =>
-            data
-        }
-      }
+      //(mockReporter.report _).when().returns("ABCD")
 
-      val flakyRequestWithRetry: IO[String] =
-        retryingOnAllErrors[String](
-          policy = retryFiveTimes,
-          onError = logError
-        )(flakyRequest)
-
-      val result = flakyRequestWithRetry.unsafeRunSync()
-
-      logMessages.foreach(println)
+      (mockReporter.report _).expects().returning("ABCD").once()
+      (mockReporter.ack _).expects().once()
 
 
+      1 times mockReporter.report
 
-      // Failed to download. So far we have retried 0 times.
+      1 times mockReporter.ack
 
-      WireMock.configureFor("127.0.0.1", 8089)
-      WireMock.reset()
+//      (mockReporter.report _).verify()
+//      (mockReporter.ack _).verify()
 
-      wireMockServer.shutdown();
+      val o1 = List(Some(1),Some(2),None)
 
-      result should be("This is Step 2")
+      val r = for {
+        o <- o1
+        x <- o
+      } yield x + 1
+
+      r shouldBe List(2,3)
+
+      val r2 = o1.flatMap((x) => x.map((y) => y + 1))
+
+      r2 shouldBe List(2,3)
+
+
     }
+  }
 
-    "Second download fails" in {
+  case class Person(`@id`: String, personInfo: PersonInfo)
+  case class PersonInfo(displayName: String, tags: Seq[Tag])
+  case class Tag(label: String)
 
-      val wireMockServer = new WireMockServer(options().port(9000)
-        .usingFilesUnderClasspath("wiremock")
-      ) //No-args constructor will start on port 8080, no HTTPS
+  case class Book(title: String, price: Int)
 
-      wireMockServer.start()
+  "json4s" should {
+    "bbb" in {
+      implicit val format = DefaultFormats;
 
-      val request = basicRequest
-        .get(uri"http://127.0.0.1:9000/scenario-2")
+      val str =
+        """
+          |{
+          |  "@id" : "Jack",
+          |  "personInfo" : {
+          |    "displayName" : "Jack Lee",
+          |    "age" : 99,
+          |    "tags" : [ { "label" : "GOLD" } ]
+          |  }
+          |}
+          |""".stripMargin
 
-      val retryFiveTimes = RetryPolicies.limitRetries[IO](3)
+      val p = parse(str).extract[Person]
 
-      val logMessages = collection.mutable.ArrayBuffer.empty[String]
-      // logMessages: collection.mutable.ArrayBuffer[String] = ArrayBuffer(
-      //   "Failed to download. So far we have retried 0 times.",
-      // )
+      val j = parse(str)
+      val j1 = j \ "@id"
 
-      def logError(err: Throwable, details: RetryDetails): IO[Unit] = details match {
+      p.`@id` shouldBe "Jack"
+      p.personInfo.displayName shouldBe "Jack Lee"
+      p.personInfo.tags.size shouldBe 1
 
-        case WillDelayAndRetry(nextDelay: FiniteDuration,
-        retriesSoFar: Int,
-        cumulativeDelay: FiniteDuration) =>
-          IO {
-            logMessages.append(
-              s"Failed to download. So far we have retried $retriesSoFar times.")
-          }
+      import org.json4s.JsonDSL._
 
-        case GivingUp(totalRetries: Int, totalDelay: FiniteDuration) =>
-          IO {
-            logMessages.append(s"Giving up after $totalRetries retries")
-          }
+      compact(decompose(Book("Green", 99))) shouldBe "{\"title\":\"Green\",\"price\":99}"
 
-      }
+      val xp =
+        <Person><Name>Jack</Name></Person>
 
-      // Now we have a retry policy and an error handler, we can wrap our `IO` inretries.
+      val strWriter = new StringWriter()
+      scala.xml.XML.write(strWriter, xp, "", false, null)
 
-      val flakyRequest: IO[String] = IO {
-        println("calling remote API")
-        println("==================")
-        request.send(backend).body match {
-          case Left(error) => throw new Error(s"Error when executing request:")
-          case Right(data) =>
-            data
-        }
-      }
+      strWriter.toString.replace("\r","").replace("\n","") shouldBe "<Person><Name>Jack</Name></Person>"
+  }
+  }
 
-      val flakyRequestWithRetry: IO[String] =
-        retryingOnAllErrors[String](
-          policy = retryFiveTimes,
-          onError = logError
-        )(flakyRequest)
-
-      val result = flakyRequestWithRetry.unsafeRunSync()
-
-      logMessages.foreach(println)
-
-      // Failed to download. So far we have retried 0 times.
-
-      WireMock.configureFor("127.0.0.1", 9000)
-
-      wireMockServer.shutdown();
-
-      result should be("This is Step 1")
+  "Computer" should {
+    "add" in {
+      Computer.add(1,2) shouldBe 3
+    }
+    "diff a smaller than b" in {
+      Computer.diff(1, 2) shouldBe 1
+    }
+    "diff a larger than b" in {
+      Computer.diff(2, 1) shouldBe 1
     }
   }
 }

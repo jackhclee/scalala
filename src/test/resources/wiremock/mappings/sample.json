@@ -79,7 +79,21 @@
         "statusMessage": "Everything was just fine!",
         "body": "This is Step 3"
       }
+    },
+    {
+      "scenarioName": "scenario4",
+      "requiredScenarioState": "Started",
+      "request": {
+        "method": "GET",
+        "url": "/scenario-4"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/octet-stream"
+        },
+        "bodyFileName" : "TARA.tar"
+      }
     }
-
   ]
 }
