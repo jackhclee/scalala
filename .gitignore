@@ -13,4 +13,5 @@ project/
 .idea/
 .bsp/
 .DS_Store
+*.tar
 
