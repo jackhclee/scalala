@@ -5,6 +5,10 @@ scalaVersion := "2.13.10"
 val catsRetryVersion = "3.1.0"
 val akkaVersion = "2.6.20"
 
+
+
+publish / skip := true
+
 libraryDependencies ++= Seq(
   "org.typelevel"                 %% "cats-core"         % "2.7.0",
   "net.debasishg"                 %% "redisclient"       % "3.42",
