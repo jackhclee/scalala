@@ -1,6 +1,6 @@
 import sbtrelease.ReleaseStateTransformations._
 
-//scalaVersion := "2.13.9"
+ThisBuild / scalaVersion := "2.12.18"
 
 lazy val domain = project.in(file("modules/domain"))
   .settings(
@@ -14,9 +14,11 @@ lazy val root = project.in(file("."))
   .aggregate(domain)
 
 libraryDependencies ++= Seq(
-  "org.typelevel" %% "cats-core"      % "2.7.0",
-  "org.json4s"    %% "json4s-jackson" % "4.1.0-M2",
-  "org.json4s"    %% "json4s-ext"     % "4.1.0-M2"
+  "org.typelevel" %% "cats-core"               % "2.7.0",
+  "org.json4s"    %% "json4s-jackson"          % "4.1.0-M2",
+  "org.json4s"    %% "json4s-ext"              % "4.1.0-M2",
+  "org.scalatest" %% "scalatest"               % "3.2.17"    % Test,
+  "org.mockito"   %% "mockito-scala-scalatest" % "1.17.30"   % Test
 )
 
 releaseIgnoreUntrackedFiles := true
