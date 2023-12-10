@@ -3,7 +3,7 @@ import org.json4s.jackson.Serialization
 
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-
+import org.json4s.ext._
 
 object CmdLine {
   def main(args: Array[String]) = {

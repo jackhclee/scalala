@@ -1,10 +1,7 @@
-
-
-
 object ImplicitEnv {
 
   implicit class Eng(in: Int) {
-    val inEnglish = makeImplicitString(in)
+    val inEnglish: String = makeImplicitString(in)
   }
 
   def make(i: Int): String = {
