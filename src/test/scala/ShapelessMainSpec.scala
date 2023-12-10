@@ -6,7 +6,7 @@ class ShapelessMainSpec extends AnyWordSpec with Matchers {
   "Shape" when {
     "created" should {
       "work" in {
-        ShapelessMain.getGeneric().select[String] shouldBe "ABC"
+         ShapelessMain.getMaskedConfig().password shouldBe Secret("******")
       }
     }
   }
