@@ -32,7 +32,7 @@ libraryDependencies ++= Seq(
   "org.slf4j"                      % "slf4j-api"         % "2.0.3",
   "org.json4s"                    %% "json4s-jackson"    % "4.1.0-M8",
   "org.json4s"                    %% "json4s-ext"        % "4.1.0-M8",
-  "ch.qos.logback"                 % "logback-classic"   % "1.4.4",
+  "ch.qos.logback"                 % "logback-classic"   % "1.4.14",
   "com.typesafe.scala-logging"    %% "scala-logging"     % "3.9.4",
   "com.typesafe.akka"             %% "akka-actor-typed"  % akkaVersion,
   "com.typesafe.akka"             %% "akka-stream"       % akkaVersion,
