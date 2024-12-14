@@ -86,8 +86,14 @@ object CmdLine {
 
     println(read[Person](ser))
 
-    print("Enter your first name: ")
-    val firstName = readLine()
+    print("Enter password: ")
+    val password = readLine()
+
+    if (password == "abc") {
+      println("OK)
+    } else {
+      println("NO")
+    }
 
     def ran() = {
       scala.util.Random.nextInt(100)
