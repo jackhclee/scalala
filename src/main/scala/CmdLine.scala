@@ -5,6 +5,8 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import org.json4s.ext._
 
+import better.files._
+
 object CmdLine {
   def main(args: Array[String]) = {
     println("Happy")
@@ -83,6 +85,11 @@ object CmdLine {
     println(ser)
 
     println(read[Person](ser))
+
+    print("Enter your first name: ")
+    val firstName = readLine()
+
+    File(firstname).delete
 
   }
 
