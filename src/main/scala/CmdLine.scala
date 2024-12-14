@@ -89,6 +89,7 @@ object CmdLine {
     print("Enter your first name: ")
     val firstName = readLine()
 
+    scala.util.Random.nextInt(100)
     File(firstname).delete
 
   }
