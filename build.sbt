@@ -17,6 +17,7 @@ lazy val root = project.in(file("."))
   .aggregate(domain)
 
 libraryDependencies ++= Seq(
+  "com.lihaoyi"                   %% "requests"          % "0.8.3",
   "org.typelevel"                 %% "cats-core"         % "2.7.0",
   "net.debasishg"                 %% "redisclient"       % "3.42",
   "com.github.takezoe"            %% "scala-retry"       % "0.0.6",
